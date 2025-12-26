@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dungeon de Musgo</title>
+    <title>Descrição</title>
     <style>
         :root {
             --bg-color: #ffffff;
@@ -22,7 +22,6 @@
             font-family: 'Courier New', monospace;
             transition: background-color 0.3s, color 0.3s;
             min-height: 200vh;
-            /* Desabilita o menu de contexto no mobile para o toque longo funcionar melhor */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
@@ -59,7 +58,7 @@
     <div class="limbo-degrade" id="limbo"></div>
 
     <div class="content" id="mainContent">
-        <h1>A Dungeon de Musgo</h1>
+        <h1>Descrição</h1>
         <p>A névoa verde consome o horizonte.</p>
         <p>Role para baixo para avançar...</p>
         <div style="height: 1000px;"></div>
@@ -70,44 +69,35 @@
             document.body.classList.toggle('dark-mode');
         }
 
-        // Atalho Teclado
         document.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 't') toggleTheme();
         });
 
-        // Lógica de Toque Duplo e Longo (Mobile)
         let touchTimer;
         let leftSideTouched = false;
         let rightSideTouched = false;
 
         document.addEventListener('touchstart', (e) => {
             const width = window.innerWidth;
-            
-            // Detecta quais lados estão sendo tocados
             for (let i = 0; i < e.touches.length; i++) {
                 if (e.touches[i].clientX < width / 2) leftSideTouched = true;
                 if (e.touches[i].clientX >= width / 2) rightSideTouched = true;
             }
-
-            // Se ambos os lados forem tocados, inicia o cronômetro de 2 segundos
             if (leftSideTouched && rightSideTouched) {
                 clearTimeout(touchTimer);
                 touchTimer = setTimeout(() => {
                     toggleTheme();
-                    // Feedback visual opcional: uma pequena vibração se o celular suportar
                     if (navigator.vibrate) navigator.vibrate(50);
                 }, 2000); 
             }
         });
 
         document.addEventListener('touchend', () => {
-            // Se soltar qualquer dedo, cancela o cronômetro
             clearTimeout(touchTimer);
             leftSideTouched = false;
             rightSideTouched = false;
         });
 
-        // Efeito de Scroll
         window.addEventListener('scroll', () => {
             const opacity = 1 - (window.scrollY / 600);
             const val = opacity < 0 ? 0 : opacity;
