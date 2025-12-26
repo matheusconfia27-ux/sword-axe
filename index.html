@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon de Musgo</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --limbo-start: #2d4c1e; /* Verde Musgo */
+        }
+
+        body.dark-mode {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --limbo-start: #1a2e11; /* Verde mais fechado no escuro */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 250vh; /* Espaço para scroll */
+        }
+
+        /* O Limbo: Aumentado para 45% da tela */
+        .limbo-degrade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 45vh; 
+            /* Degradê suave do verde para a cor do fundo */
+            background: linear-gradient(to bottom, 
+                var(--limbo-start) 0%, 
+                var(--bg-color) 100%);
+            z-index: 1;
+            transition: background 0.3s;
+        }
+
+        .content {
+            position: relative;
+            padding: 50px;
+            text-align: center;
+            /* Começa um pouco antes do fim do limbo para dar profundidade */
+            margin-top: 40vh; 
+            z-index: 2;
+        }
+
+        .hint {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0.6;
+            z-index: 100;
+            padding: 5px 10px;
+            background: rgba(128, 128, 128, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hint">Aperte "T" para alternar o tema</div>
+
+    <div class="limbo-degrade" id="limbo"></div>
+
+    <div class="content" id="mainContent">
+        <h1>A Dungeon de Musgo</h1>
+        <p>A névoa verde consome o horizonte.</p>
+        <p>Role para baixo para ver tudo desaparecer...</p>
+        <div style="height: 1200px;"></div>
+    </div>
+
+    <script>
+        const body = document.body;
+        const mainContent = document.getElementById('mainContent');
+        const limbo = document.getElementById('limbo');
+
+        // Alternar Tema com T
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 't') {
+                body.classList.toggle('dark-mode');
+            }
+        });
+
+        // Efeito de Opacidade no Scroll
+        window.addEventListener('scroll', () => {
+            const scrollPos = window.scrollY;
+            
+            // A opacidade diminui conforme você desce
+            // Ajustado para sumir completamente após 600px de scroll
+            let opacity = 1 - (scrollPos / 600);
+            
+            if (opacity < 0) opacity = 0;
+            if (opacity > 1) opacity = 1;
+            
+            mainContent.style.opacity = opacity;
+            limbo.style.opacity = opacity;
+        });
+    </script>
+</body>
+</html>
