@@ -8,101 +8,111 @@
         :root {
             --bg-color: #ffffff;
             --text-color: #000000;
-            --limbo-start: #2d4c1e; /* Verde Musgo */
+            --limbo-start: #2d4c1e;
         }
-
         body.dark-mode {
             --bg-color: #000000;
             --text-color: #ffffff;
-            --limbo-start: #1a2e11; /* Verde mais fechado no escuro */
+            --limbo-start: #1a2e11;
         }
-
         body {
             margin: 0;
-            padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Courier New', monospace;
             transition: background-color 0.3s, color 0.3s;
-            min-height: 250vh; /* Espaço para scroll */
+            min-height: 200vh;
+            /* Desabilita o menu de contexto no mobile para o toque longo funcionar melhor */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
-
-        /* O Limbo: Aumentado para 45% da tela */
         .limbo-degrade {
             position: fixed;
             top: 0;
-            left: 0;
             width: 100%;
             height: 45vh; 
-            /* Degradê suave do verde para a cor do fundo */
-            background: linear-gradient(to bottom, 
-                var(--limbo-start) 0%, 
-                var(--bg-color) 100%);
+            background: linear-gradient(to bottom, var(--limbo-start), var(--bg-color));
             z-index: 1;
-            transition: background 0.3s;
         }
-
         .content {
             position: relative;
             padding: 50px;
             text-align: center;
-            /* Começa um pouco antes do fim do limbo para dar profundidade */
             margin-top: 40vh; 
             z-index: 2;
         }
-
         .hint {
             position: fixed;
             top: 15px;
             right: 15px;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 10px;
             opacity: 0.6;
             z-index: 100;
-            padding: 5px 10px;
-            background: rgba(128, 128, 128, 0.2);
-            border-radius: 4px;
+            text-align: right;
         }
     </style>
 </head>
 <body>
 
-    <div class="hint">Aperte "T" para alternar o tema</div>
-
+    <div class="hint">PC: Aperte "T"<br>Mobile: Segure os dois lados por 2s</div>
     <div class="limbo-degrade" id="limbo"></div>
 
     <div class="content" id="mainContent">
         <h1>A Dungeon de Musgo</h1>
         <p>A névoa verde consome o horizonte.</p>
-        <p>Role para baixo para ver tudo desaparecer...</p>
-        <div style="height: 1200px;"></div>
+        <p>Role para baixo para avançar...</p>
+        <div style="height: 1000px;"></div>
     </div>
 
     <script>
-        const body = document.body;
-        const mainContent = document.getElementById('mainContent');
-        const limbo = document.getElementById('limbo');
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
 
-        // Alternar Tema com T
+        // Atalho Teclado
         document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 't') {
-                body.classList.toggle('dark-mode');
+            if (e.key.toLowerCase() === 't') toggleTheme();
+        });
+
+        // Lógica de Toque Duplo e Longo (Mobile)
+        let touchTimer;
+        let leftSideTouched = false;
+        let rightSideTouched = false;
+
+        document.addEventListener('touchstart', (e) => {
+            const width = window.innerWidth;
+            
+            // Detecta quais lados estão sendo tocados
+            for (let i = 0; i < e.touches.length; i++) {
+                if (e.touches[i].clientX < width / 2) leftSideTouched = true;
+                if (e.touches[i].clientX >= width / 2) rightSideTouched = true;
+            }
+
+            // Se ambos os lados forem tocados, inicia o cronômetro de 2 segundos
+            if (leftSideTouched && rightSideTouched) {
+                clearTimeout(touchTimer);
+                touchTimer = setTimeout(() => {
+                    toggleTheme();
+                    // Feedback visual opcional: uma pequena vibração se o celular suportar
+                    if (navigator.vibrate) navigator.vibrate(50);
+                }, 2000); 
             }
         });
 
-        // Efeito de Opacidade no Scroll
+        document.addEventListener('touchend', () => {
+            // Se soltar qualquer dedo, cancela o cronômetro
+            clearTimeout(touchTimer);
+            leftSideTouched = false;
+            rightSideTouched = false;
+        });
+
+        // Efeito de Scroll
         window.addEventListener('scroll', () => {
-            const scrollPos = window.scrollY;
-            
-            // A opacidade diminui conforme você desce
-            // Ajustado para sumir completamente após 600px de scroll
-            let opacity = 1 - (scrollPos / 600);
-            
-            if (opacity < 0) opacity = 0;
-            if (opacity > 1) opacity = 1;
-            
-            mainContent.style.opacity = opacity;
-            limbo.style.opacity = opacity;
+            const opacity = 1 - (window.scrollY / 600);
+            const val = opacity < 0 ? 0 : opacity;
+            document.getElementById('mainContent').style.opacity = val;
+            document.getElementById('limbo').style.opacity = val;
         });
     </script>
 </body>
