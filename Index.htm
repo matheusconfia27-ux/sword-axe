@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descrição</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --limbo-start: #2d4c1e;
+        }
+        body.dark-mode {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --limbo-start: #1a2e11;
+        }
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 200vh;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .limbo-degrade {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 45vh; 
+            background: linear-gradient(to bottom, var(--limbo-start), var(--bg-color));
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            padding: 50px;
+            text-align: center;
+            margin-top: 40vh; 
+            z-index: 2;
+        }
+        .hint {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            font-size: 10px;
+            opacity: 0.6;
+            z-index: 100;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hint">PC: Aperte "T"<br>Mobile: Segure os dois lados por 2s</div>
+    <div class="limbo-degrade" id="limbo"></div>
+
+    <div class="content" id="mainContent">
+        <h1>Descrição</h1>
+        <p>A névoa verde consome o horizonte.</p>
+        <p>Role para baixo para avançar...</p>
+        <div style="height: 1000px;"></div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 't') toggleTheme();
+        });
+
+        let touchTimer;
+        let leftSideTouched = false;
+        let rightSideTouched = false;
+
+        document.addEventListener('touchstart', (e) => {
+            const width = window.innerWidth;
+            for (let i = 0; i < e.touches.length; i++) {
+                if (e.touches[i].clientX < width / 2) leftSideTouched = true;
+                if (e.touches[i].clientX >= width / 2) rightSideTouched = true;
+            }
+            if (leftSideTouched && rightSideTouched) {
+                clearTimeout(touchTimer);
+                touchTimer = setTimeout(() => {
+                    toggleTheme();
+                    if (navigator.vibrate) navigator.vibrate(50);
+                }, 2000); 
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            clearTimeout(touchTimer);
+            leftSideTouched = false;
+            rightSideTouched = false;
+        });
+
+        window.addEventListener('scroll', () => {
+            const opacity = 1 - (window.scrollY / 600);
+            const val = opacity < 0 ? 0 : opacity;
+            document.getElementById('mainContent').style.opacity = val;
+            document.getElementById('limbo').style.opacity = val;
+        });
+    </script>
+</body>
+</html>
